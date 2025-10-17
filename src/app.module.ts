@@ -5,6 +5,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import configuration from './config/configuration';
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -35,6 +37,10 @@ import configuration from './config/configuration';
       ],
       inject: [ConfigService],
     }),
+
+    // Módulos de la aplicación
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
