@@ -1,29 +1,194 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🚀 Portfolio Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend profesional para portfolio personal desarrollado con **NestJS**, **MongoDB** y **TypeScript**.  
+Incluye autenticación JWT, documentación con Swagger y features potenciadas con IA.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Tabla de Contenidos
 
-## Description
+- [Stack Tecnológico](#-stack-tecnológico)
+- [Características](#-características)
+- [Instalación](#-instalación)
+- [Configuración](#️-configuración)
+- [Ejecución](#-ejecución)
+- [Documentación API](#-documentación-api)
+- [Deploy](#-deploy)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🛠️ Stack Tecnológico
+
+- **Node.js** v18+
+- **NestJS** v10
+- **TypeScript** v5
+- **MongoDB** con Mongoose
+- **JWT** para autenticación
+- **Swagger** para documentación
+- **Class Validator** para validaciones
+- **Helmet** para seguridad
+- **Throttler** para rate limiting
+
+## ✨ Características
+
+### Core Features
+
+- 🔐 **Autenticación JWT** con refresh tokens
+- 👥 **Gestión de usuarios** con roles (Admin/Visitor)
+- 📁 **CRUD de proyectos** con información detallada
+- ⭐ **Sistema de reseñas** y testimonios
+- 🎯 **Skills y tecnologías** categorizadas
+- 📊 **Analytics** de visitas y estadísticas
+
+### Features Especiales
+
+- 🤖 **AI Insights** - Análisis de código con IA
+- 📈 **Tracking de código generado con IA** por proyecto
+- 🔒 **Rate Limiting** para protección contra abuso
+- 📚 **Documentación Swagger** interactiva
+- 🛡️ **Seguridad** con Helmet y validaciones estrictas
+
+## 🚀 Instalación
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/MateoGaviraghi/Mi-Portfolio-Back-End.git
+
+# Instalar dependencias
+npm install
+```
+
+## ⚙️ Configuración
+
+1. **Crear archivo `.env`** basado en `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+2. **Configurar variables de entorno**:
+
+```env
+# Database
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/portfolio
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key
+JWT_REFRESH_SECRET=your-refresh-secret-key
+
+# Server
+PORT=3001
+NODE_ENV=development
+
+# CORS
+FRONTEND_URL=http://localhost:3000
+```
+
+3. **Configurar MongoDB**:
+   - Crear cuenta en [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+   - Crear un cluster gratuito
+   - Obtener la URI de conexión
+   - Agregar tu IP a la whitelist
+
+## 🏃 Ejecución
+
+```bash
+# Desarrollo
+npm run start:dev
+
+# Producción
+npm run build
+npm run start:prod
+
+# Tests
+npm run test
+
+# E2E tests
+npm run test:e2e
+```
+
+La aplicación estará disponible en:
+
+- **API**: http://localhost:3001/api
+- **Swagger Docs**: http://localhost:3001/api/docs
+
+## 📚 Documentación API
+
+Una vez iniciada la aplicación, visita:
+
+**http://localhost:3001/api/docs**
+
+Swagger UI te permitirá:
+
+- Ver todos los endpoints disponibles
+- Probar requests directamente
+- Ver esquemas de datos
+- Autenticarte con JWT
+
+### Endpoints Principales
+
+#### Auth
+
+- `POST /api/auth/register` - Registrar usuario
+- `POST /api/auth/login` - Iniciar sesión
+- `POST /api/auth/refresh` - Refrescar token
+
+#### Projects
+
+- `GET /api/projects` - Listar proyectos
+- `GET /api/projects/:id` - Ver detalle
+- `POST /api/projects` - Crear (Admin)
+- `PUT /api/projects/:id` - Actualizar (Admin)
+- `DELETE /api/projects/:id` - Eliminar (Admin)
+
+#### Reviews
+
+- `GET /api/reviews` - Listar reseñas
+- `POST /api/reviews` - Crear reseña (Auth)
+
+## 🌐 Deploy
+
+### Vercel (Recomendado)
+
+1. **Instalar Vercel CLI**:
+
+```bash
+npm i -g vercel
+```
+
+2. **Deploy**:
+
+```bash
+vercel
+```
+
+3. **Configurar variables de entorno** en Vercel Dashboard
+
+## 📁 Estructura del Proyecto
+
+```
+src/
+├── auth/              # Módulo de autenticación
+├── users/             # Gestión de usuarios
+├── projects/          # Proyectos del portfolio
+├── reviews/           # Sistema de reseñas
+├── skills/            # Habilidades técnicas
+├── analytics/         # Estadísticas
+├── ai-insights/       # Features con IA
+├── common/            # Utilidades compartidas
+│   ├── decorators/
+│   ├── filters/
+│   ├── interceptors/
+│   └── pipes/
+├── config/            # Configuraciones
+└── main.ts           # Punto de entrada
+```
+
+## 👨‍💻 Autor
+
+**Mateo Gaviraghi**
+
+- GitHub: [@MateoGaviraghi](https://github.com/MateoGaviraghi)
+
+---
+
+⚡ **Desarrollado con NestJS y potenciado con IA** 🤖
 
 ## Project setup
 
