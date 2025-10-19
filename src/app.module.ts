@@ -7,6 +7,9 @@ import { AppService } from './app.service';
 import configuration from './config/configuration';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ProjectsModule } from './modules/projects/projects.module';
+import { SkillsModule } from './modules/skills/skills.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -41,6 +44,9 @@ import { AuthModule } from './modules/auth/auth.module';
     // Módulos de la aplicación
     UsersModule,
     AuthModule,
+    ProjectsModule,
+    SkillsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
