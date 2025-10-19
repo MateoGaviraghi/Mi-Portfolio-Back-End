@@ -33,12 +33,36 @@ async function bootstrap() {
   // Security
   app.use(helmet());
 
-  // CORS
+  // CORS - Permitir múltiples orígenes
+  const allowedOrigins = configService.get<string[]>('cors.origins') || [
+    'http://localhost:3000',
+    'http://localhost:3017',
+  ];
+
   app.enableCors({
-    origin: configService.get<string>('cors.origin'),
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      // Permitir requests sin origin (mobile apps, curl, etc)
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      // Verificar si el origin está en la lista permitida
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        logger.warn(`CORS blocked request from origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    exposedHeaders: ['Authorization'],
+    maxAge: 86400, // 24 horas de cache para preflight requests
   });
 
   // Global pipes

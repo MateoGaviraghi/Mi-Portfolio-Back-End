@@ -11,7 +11,10 @@ export default () => ({
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRATION || '7d',
   },
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    // Permitir múltiples orígenes (desarrollo y producción)
+    origins: process.env.FRONTEND_URLS
+      ? process.env.FRONTEND_URLS.split(',')
+      : ['http://localhost:3000', 'http://localhost:3017'],
   },
   throttle: {
     ttl: parseInt(process.env.THROTTLE_TTL || '60', 10),
