@@ -74,6 +74,9 @@ if (require.main === module) {
 }
 
 // Para Vercel (serverless)
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 export default async (req: any, res: any) => {
   const app = await bootstrap();
   const expressApp = app.getHttpAdapter().getInstance();
