@@ -12,6 +12,21 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
 
+  // Pre-flight checks: ensure required env vars are present and valid.
+  const mongodbUri = configService.get<string>('database.uri');
+  if (!mongodbUri || mongodbUri.trim() === '') {
+    // Throw early with a helpful error so serverless platforms show a clear cause
+    throw new Error(
+      'Missing required environment variable MONGODB_URI (database.uri). Please set it in your environment or in Vercel Project Settings.',
+    );
+  }
+  // Basic sanity check for connection string form
+  if (!mongodbUri.startsWith('mongodb')) {
+    throw new Error(
+      'The MONGODB_URI does not look like a valid MongoDB connection string. Make sure it starts with "mongodb+srv://" or "mongodb://".',
+    );
+  }
+
   // Global prefix
   app.setGlobalPrefix('api');
 
