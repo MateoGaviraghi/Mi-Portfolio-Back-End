@@ -10,6 +10,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { SkillsModule } from './modules/skills/skills.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { AiInsightsModule } from './modules/ai-insights/ai-insights.module';
 
 @Module({
   imports: [
@@ -47,6 +49,8 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     ProjectsModule,
     SkillsModule,
     ReviewsModule,
+    AnalyticsModule,
+    AiInsightsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
