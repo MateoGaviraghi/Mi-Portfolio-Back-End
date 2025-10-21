@@ -8,6 +8,30 @@ export enum ProjectCategory {
   BACKEND = 'backend',
 }
 
+// Sub-schema para archivos multimedia de Cloudinary
+class CloudinaryFile {
+  @Prop({ required: true })
+  url: string;
+
+  @Prop({ required: true })
+  publicId: string;
+
+  @Prop()
+  width?: number;
+
+  @Prop()
+  height?: number;
+
+  @Prop()
+  format?: string;
+
+  @Prop()
+  resourceType?: string;
+
+  @Prop()
+  thumbnail?: string;
+}
+
 export type ProjectDocument = Project & Document;
 
 @Schema({ timestamps: true })
@@ -23,14 +47,14 @@ export class Project {
   @Prop({ required: true })
   longDescription: string;
 
-  @Prop({ type: [String], required: true })
+  @Prop({ required: true })
   technologies: string[];
 
-  @Prop({ type: [String], default: [] })
-  images: string[]; // URLs de Cloudinary
+  @Prop({ type: [CloudinaryFile], default: [] })
+  images: CloudinaryFile[];
 
-  @Prop({ type: [String], default: [] })
-  videos: string[]; // URLs de Cloudinary
+  @Prop({ type: [CloudinaryFile], default: [] })
+  videos: CloudinaryFile[];
 
   @Prop()
   githubUrl?: string;

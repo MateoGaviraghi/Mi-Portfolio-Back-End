@@ -27,6 +27,23 @@ async function bootstrap() {
     );
   }
 
+  // Pre-flight check: Cloudinary configuration
+  const cloudinaryName = configService.get<string>('cloudinary.cloudName');
+  const cloudinaryKey = configService.get<string>('cloudinary.apiKey');
+  const cloudinarySecret = configService.get<string>('cloudinary.apiSecret');
+
+  if (cloudinaryName && cloudinaryKey && cloudinarySecret) {
+    logger.log('✅ Cloudinary configured successfully');
+    logger.log(`📦 Cloudinary Cloud Name: ${cloudinaryName}`);
+  } else {
+    logger.warn(
+      '⚠️  Cloudinary not configured - file upload features will not work',
+    );
+    logger.warn(
+      'Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in your .env',
+    );
+  }
+
   // Global prefix
   app.setGlobalPrefix('api');
 

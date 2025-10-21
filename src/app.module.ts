@@ -12,6 +12,7 @@ import { SkillsModule } from './modules/skills/skills.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { AiInsightsModule } from './modules/ai-insights/ai-insights.module';
+import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { AiInsightsModule } from './modules/ai-insights/ai-insights.module';
     ReviewsModule,
     AnalyticsModule,
     AiInsightsModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

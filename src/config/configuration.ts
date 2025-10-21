@@ -23,4 +23,10 @@ export default () => ({
   ai: {
     openaiApiKey: process.env.OPENAI_API_KEY || '',
   },
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+    apiKey: process.env.CLOUDINARY_API_KEY || '',
+    apiSecret: process.env.CLOUDINARY_API_SECRET || '',
+    folder: process.env.CLOUDINARY_FOLDER || 'portfolio',
+  },
 });
