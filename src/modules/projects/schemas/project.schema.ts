@@ -8,13 +8,27 @@ export enum ProjectCategory {
   BACKEND = 'backend',
 }
 
-// Sub-schema para archivos multimedia de Cloudinary
-class CloudinaryFile {
-  @Prop({ required: true })
-  url: string;
+// Sub-schema para thumbnails
+@Schema({ _id: false })
+class Thumbnails {
+  @Prop()
+  small?: string;
 
-  @Prop({ required: true })
+  @Prop()
+  medium?: string;
+
+  @Prop()
+  large?: string;
+}
+
+// Sub-schema para archivos multimedia de Cloudinary (imágenes)
+@Schema({ _id: true })
+class CloudinaryImage {
+  @Prop({ required: true, name: 'public_id' })
   publicId: string;
+
+  @Prop({ required: true, name: 'secure_url' })
+  secureUrl: string;
 
   @Prop()
   width?: number;
@@ -26,7 +40,35 @@ class CloudinaryFile {
   format?: string;
 
   @Prop()
-  resourceType?: string;
+  bytes?: number;
+
+  @Prop({ type: Thumbnails })
+  thumbnails?: Thumbnails;
+}
+
+// Sub-schema para videos de Cloudinary
+@Schema({ _id: true })
+class CloudinaryVideo {
+  @Prop({ required: true, name: 'public_id' })
+  publicId: string;
+
+  @Prop({ required: true, name: 'secure_url' })
+  secureUrl: string;
+
+  @Prop()
+  width?: number;
+
+  @Prop()
+  height?: number;
+
+  @Prop()
+  format?: string;
+
+  @Prop()
+  bytes?: number;
+
+  @Prop()
+  duration?: number;
 
   @Prop()
   thumbnail?: string;
@@ -50,11 +92,11 @@ export class Project {
   @Prop({ required: true })
   technologies: string[];
 
-  @Prop({ type: [CloudinaryFile], default: [] })
-  images: CloudinaryFile[];
+  @Prop({ type: [CloudinaryImage], default: [] })
+  images: CloudinaryImage[];
 
-  @Prop({ type: [CloudinaryFile], default: [] })
-  videos: CloudinaryFile[];
+  @Prop({ type: [CloudinaryVideo], default: [] })
+  videos: CloudinaryVideo[];
 
   @Prop()
   githubUrl?: string;

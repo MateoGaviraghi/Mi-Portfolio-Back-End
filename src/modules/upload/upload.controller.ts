@@ -175,4 +175,144 @@ export class UploadController {
       result: result.result,
     };
   }
+
+  // ====== NUEVOS ENDPOINTS: Subir y agregar al proyecto automáticamente ======
+
+  @Post('project/:projectId/image')
+  @Roles(UserRole.ADMIN)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({
+    summary: 'Subir imagen y agregarla al proyecto',
+    description:
+      'Sube una imagen a Cloudinary y la agrega automáticamente al array de imágenes del proyecto',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Archivo de imagen (JPG, PNG, WebP, GIF)',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Imagen subida y agregada al proyecto exitosamente',
+  })
+  @ApiResponse({ status: 400, description: 'Archivo inválido' })
+  @ApiResponse({ status: 404, description: 'Proyecto no encontrado' })
+  async uploadAndAddImageToProject(
+    @Param('projectId') projectId: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
+          new FileTypeValidator({
+            fileType: /(jpg|jpeg|png|webp|gif)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file provided');
+    }
+    return await this.uploadService.uploadAndAddImageToProject(projectId, file);
+  }
+
+  @Post('project/:projectId/video')
+  @Roles(UserRole.ADMIN)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({
+    summary: 'Subir video y agregarlo al proyecto',
+    description:
+      'Sube un video a Cloudinary y lo agrega automáticamente al array de videos del proyecto',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Archivo de video (MP4, WebM, MOV)',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Video subido y agregado al proyecto exitosamente',
+  })
+  @ApiResponse({ status: 400, description: 'Archivo inválido' })
+  @ApiResponse({ status: 404, description: 'Proyecto no encontrado' })
+  async uploadAndAddVideoToProject(
+    @Param('projectId') projectId: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }), // 50MB
+          new FileTypeValidator({
+            fileType: /(mp4|webm|mov)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file provided');
+    }
+    return await this.uploadService.uploadAndAddVideoToProject(projectId, file);
+  }
+
+  @Delete('project/:projectId/image/:publicId')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Eliminar imagen del proyecto',
+    description:
+      'Elimina la imagen de Cloudinary y la remueve del array del proyecto',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Imagen eliminada del proyecto exitosamente',
+  })
+  async deleteImageFromProject(
+    @Param('projectId') projectId: string,
+    @Param('publicId') publicId: string,
+  ) {
+    const decodedPublicId = decodeURIComponent(publicId);
+    return await this.uploadService.deleteImageFromProject(
+      projectId,
+      decodedPublicId,
+    );
+  }
+
+  @Delete('project/:projectId/video/:publicId')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Eliminar video del proyecto',
+    description:
+      'Elimina el video de Cloudinary y lo remueve del array del proyecto',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Video eliminado del proyecto exitosamente',
+  })
+  async deleteVideoFromProject(
+    @Param('projectId') projectId: string,
+    @Param('publicId') publicId: string,
+  ) {
+    const decodedPublicId = decodeURIComponent(publicId);
+    return await this.uploadService.deleteVideoFromProject(
+      projectId,
+      decodedPublicId,
+    );
+  }
 }

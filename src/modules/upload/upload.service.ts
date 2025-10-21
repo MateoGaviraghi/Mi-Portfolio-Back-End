@@ -1,14 +1,24 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { UploadResponseDto } from './dto/upload-response.dto';
+import { Project, ProjectDocument } from '../projects/schemas/project.schema';
 import streamifier from 'streamifier';
 
 @Injectable()
 export class UploadService {
   private readonly folder: string;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    @InjectModel(Project.name) private projectModel: Model<ProjectDocument>,
+  ) {
     // Configurar Cloudinary
     cloudinary.config({
       cloud_name: this.configService.get<string>('cloudinary.cloudName'),
@@ -171,5 +181,210 @@ export class UploadService {
         },
       ],
     });
+  }
+
+  // ====== MÉTODOS PARA SUBIR Y AGREGAR AL PROYECTO AUTOMÁTICAMENTE ======
+
+  /**
+   * Sube una imagen a Cloudinary y la agrega al array de imágenes del proyecto
+   */
+  async uploadAndAddImageToProject(
+    projectId: string,
+    file: Express.Multer.File,
+  ) {
+    // 1. Buscar el proyecto
+    const project = await this.projectModel.findById(projectId);
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
+    // 2. Subir imagen a Cloudinary
+    const uploadResult = await this.uploadFile(file, 'projects', 'image');
+
+    // 3. Generar thumbnails en 3 tamaños
+    const thumbnails = {
+      small: cloudinary.url(uploadResult.publicId, {
+        transformation: [
+          {
+            width: 300,
+            height: 200,
+            crop: 'fill',
+            quality: 'auto',
+            fetch_format: 'auto',
+          },
+        ],
+      }),
+      medium: cloudinary.url(uploadResult.publicId, {
+        transformation: [
+          {
+            width: 600,
+            height: 400,
+            crop: 'fill',
+            quality: 'auto',
+            fetch_format: 'auto',
+          },
+        ],
+      }),
+      large: cloudinary.url(uploadResult.publicId, {
+        transformation: [
+          {
+            width: 1200,
+            height: 800,
+            crop: 'fill',
+            quality: 'auto',
+            fetch_format: 'auto',
+          },
+        ],
+      }),
+    };
+
+    // 4. Crear objeto de imagen con el formato de tu ejemplo
+    const imageData = {
+      publicId: uploadResult.publicId,
+      secureUrl: uploadResult.secureUrl,
+      width: uploadResult.width,
+      height: uploadResult.height,
+      format: uploadResult.format,
+      bytes: uploadResult.bytes,
+      thumbnails,
+    };
+
+    // 5. Agregar al array de imágenes del proyecto
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    project.images.push(imageData as any);
+    await project.save();
+
+    return {
+      message: 'Image uploaded and added to project successfully',
+      project: {
+        _id: project._id,
+        title: project.title,
+        images: project.images,
+      },
+      uploadedImage: imageData,
+    };
+  }
+
+  /**
+   * Sube un video a Cloudinary y lo agrega al array de videos del proyecto
+   */
+  async uploadAndAddVideoToProject(
+    projectId: string,
+    file: Express.Multer.File,
+  ) {
+    // 1. Buscar el proyecto
+    const project = await this.projectModel.findById(projectId);
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
+    // 2. Subir video a Cloudinary
+    const uploadResult = await this.uploadFile(file, 'projects', 'video');
+
+    // 3. Generar thumbnail del video (frame a los 10 segundos)
+    const videoThumbnail = cloudinary.url(uploadResult.publicId, {
+      resource_type: 'video',
+      transformation: [
+        {
+          width: 600,
+          height: 400,
+          crop: 'fill',
+          start_offset: '10p', // 10% del video
+        },
+      ],
+      format: 'jpg',
+    });
+
+    // 4. Obtener duración del video desde la respuesta de Cloudinary
+    // Nota: Cloudinary devuelve duration en la respuesta de upload para videos
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const duration = (uploadResult as any).duration || 0;
+
+    const videoData = {
+      publicId: uploadResult.publicId,
+      secureUrl: uploadResult.secureUrl,
+      width: uploadResult.width,
+      height: uploadResult.height,
+      format: uploadResult.format,
+      bytes: uploadResult.bytes,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      duration,
+      thumbnail: videoThumbnail,
+    };
+
+    // 5. Agregar al array de videos del proyecto
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    project.videos.push(videoData as any);
+    await project.save();
+
+    return {
+      message: 'Video uploaded and added to project successfully',
+      project: {
+        _id: project._id,
+        title: project.title,
+        videos: project.videos,
+      },
+      uploadedVideo: videoData,
+    };
+  }
+
+  /**
+   * Elimina una imagen de Cloudinary y la remueve del proyecto
+   */
+  async deleteImageFromProject(projectId: string, publicId: string) {
+    // 1. Buscar el proyecto
+    const project = await this.projectModel.findById(projectId);
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
+    // 2. Eliminar de Cloudinary
+    await this.deleteFile(publicId, 'image');
+
+    // 3. Remover del array de imágenes
+    project.images = project.images.filter(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      (img: any) => img.publicId !== publicId,
+    );
+    await project.save();
+
+    return {
+      message: 'Image deleted from project successfully',
+      project: {
+        _id: project._id,
+        title: project.title,
+        images: project.images,
+      },
+    };
+  }
+
+  /**
+   * Elimina un video de Cloudinary y lo remueve del proyecto
+   */
+  async deleteVideoFromProject(projectId: string, publicId: string) {
+    // 1. Buscar el proyecto
+    const project = await this.projectModel.findById(projectId);
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
+    // 2. Eliminar de Cloudinary
+    await this.deleteFile(publicId, 'video');
+
+    // 3. Remover del array de videos
+    project.videos = project.videos.filter(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      (video: any) => video.publicId !== publicId,
+    );
+    await project.save();
+
+    return {
+      message: 'Video deleted from project successfully',
+      project: {
+        _id: project._id,
+        title: project.title,
+        videos: project.videos,
+      },
+    };
   }
 }
