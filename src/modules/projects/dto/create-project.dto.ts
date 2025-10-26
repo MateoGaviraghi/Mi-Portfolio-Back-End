@@ -58,14 +58,15 @@ export class CreateProjectDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example:
       'Plataforma completa de e-commerce desarrollada con las últimas tecnologías...',
-    description: 'Descripción detallada del proyecto',
+    description:
+      'Descripción detallada del proyecto (opcional, sin límite de caracteres)',
   })
   @IsString()
-  @IsNotEmpty()
-  longDescription: string;
+  @IsOptional()
+  longDescription?: string;
 
   @ApiProperty({
     example: ['React', 'Node.js', 'MongoDB', 'TypeScript'],
@@ -98,18 +99,19 @@ export class CreateProjectDto {
   videos?: string[];
 
   @ApiPropertyOptional({
-    example: 'https://github.com/username/project',
-    description: 'URL del repositorio en GitHub',
+    example: 'https://github.com/usuario/proyecto',
+    description: 'URL del repositorio (opcional, string vacío si no aplica)',
   })
-  @IsUrl()
+  @IsString()
   @IsOptional()
   githubUrl?: string;
 
   @ApiPropertyOptional({
-    example: 'https://project-demo.vercel.app',
-    description: 'URL del proyecto en vivo',
+    example: 'https://proyecto-demo.vercel.app',
+    description:
+      'URL del proyecto en vivo (opcional, string vacío si no aplica)',
   })
-  @IsUrl()
+  @IsString()
   @IsOptional()
   liveUrl?: string;
 
