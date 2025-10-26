@@ -5,41 +5,10 @@ import {
   IsOptional,
   IsEnum,
   IsBoolean,
-  IsNumber,
   IsUrl,
-  Min,
-  Max,
-  ValidateNested,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import { ProjectCategory } from '../schemas/project.schema';
-
-class AiGeneratedDto {
-  @ApiProperty({
-    example: 45,
-    description: 'Porcentaje de código generado con IA (0-100)',
-  })
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  percentage: number;
-
-  @ApiProperty({
-    example: ['GitHub Copilot', 'ChatGPT', 'Claude'],
-    description: 'Herramientas de IA utilizadas',
-  })
-  @IsArray()
-  @IsString({ each: true })
-  tools: string[];
-
-  @ApiProperty({
-    example: 'Se utilizó IA para generar componentes base y lógica de negocio',
-    description: 'Descripción de cómo se utilizó IA',
-  })
-  @IsString()
-  description: string;
-}
 
 export class CreateProjectDto {
   @ApiProperty({
@@ -132,12 +101,4 @@ export class CreateProjectDto {
   @IsBoolean()
   @IsOptional()
   featured?: boolean;
-
-  @ApiProperty({
-    description: 'Información sobre el uso de IA en el proyecto',
-    type: AiGeneratedDto,
-  })
-  @ValidateNested()
-  @Type(() => AiGeneratedDto)
-  aiGenerated: AiGeneratedDto;
 }

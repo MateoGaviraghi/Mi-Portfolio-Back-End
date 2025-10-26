@@ -86,8 +86,8 @@ export class Project {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true })
-  longDescription: string;
+  @Prop()
+  longDescription?: string;
 
   @Prop({ required: true })
   technologies: string[];
@@ -109,20 +109,6 @@ export class Project {
 
   @Prop({ default: false })
   featured: boolean;
-
-  @Prop({
-    type: {
-      percentage: { type: Number, default: 0 },
-      tools: { type: [String], default: [] },
-      description: { type: String, default: '' },
-    },
-    default: { percentage: 0, tools: [], description: '' },
-  })
-  aiGenerated: {
-    percentage: number;
-    tools: string[];
-    description: string;
-  };
 
   @Prop({
     type: {
