@@ -5,7 +5,9 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import {
   ApiTags,
   ApiOperation,
@@ -24,7 +26,10 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Public()
   @Post('register')
@@ -69,10 +74,27 @@ export class AuthController {
     status: 401,
     description: 'Refresh token inválido',
   })
-  refresh(@Body() refreshTokenDto: RefreshTokenDto) {
-    // Nota: En una implementación real, deberías obtener el userId del token
-    // Por ahora, esto es un placeholder
-    return refreshTokenDto;
+  async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
+    try {
+      // Decodificar el token para obtener el userId
+      // Nota: La verificación completa se hace en el servicio
+      const decoded: unknown = this.jwtService.decode(
+        refreshTokenDto.refreshToken,
+      );
+
+      if (!decoded || typeof decoded !== 'object' || !('sub' in decoded)) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const payload = decoded as { sub: string };
+
+      return await this.authService.refreshTokens(
+        payload.sub,
+        refreshTokenDto.refreshToken,
+      );
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 
   @UseGuards(JwtAuthGuard)
